@@ -1,0 +1,30 @@
+@import "../valo/valo.scss";
+
+@mixin myStyles_new {
+  @include valo;
+
+  .header-label {
+    font-family: Times,Helvetica,sans-serif;
+    font-weight: bold;
+    font-size: 54px;
+    color:red;
+  }
+
+  .border-bottom {
+    border-bottom: solid;
+    border-bottom-color: blue;
+  }
+
+  .v-verticallayout {
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .v-horizontallayout {
+    margin: auto;
+  }
+
+  .v-button {
+    color: blue;
+  }
+}
