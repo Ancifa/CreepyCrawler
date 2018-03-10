@@ -53,7 +53,7 @@ public class MainView extends UI {
     private VerticalLayout buildHeader() {
         VerticalLayout headerLayout = new VerticalLayout();
         headerLayout.addStyleName("border-bottom");
-        Label label = new Label("MyOrganIzer");
+        Label label = new Label("Creepy Crawler");
         label.setWidth(null);
         label.addStyleName("header-label");
         headerLayout.addComponent(label);
@@ -126,9 +126,9 @@ public class MainView extends UI {
     private class BarThread implements Runnable {
         @Override
         public void run() {
-            progressBarLayout.setVisible(true);
+//            getUI().getSession().getLockInstance();
+//            progressBarLayout.setVisible(true);
             resultString.setValue("");
-            filePathString.setValue("");
             String totalNumber = "";
             while (!interrupted) {
                 category.setEnabled(false);
@@ -149,7 +149,7 @@ public class MainView extends UI {
                     e.printStackTrace();
                 }
             }
-            progressBarLayout.setVisible(false);
+//            progressBarLayout.setVisible(false);
             progressBar.setValue(0.0f);
         }
     }
@@ -168,10 +168,13 @@ public class MainView extends UI {
         public void run() {
             app.setRecordsWithEmailCounter(0);
             app.setTotalRecordsCounter(0);
+            filePathString.setValue("");
+            progressBarLayout.setVisible(true);
+
             String result = app.search(locationValue, categoryValue);
             interrupted = true;
-            progressBarLayout.setVisible(false);
 
+            progressBarLayout.setVisible(false);
             resultString.setValue(result);
             category.setEnabled(true);
             location.setEnabled(true);

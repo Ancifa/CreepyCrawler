@@ -10,7 +10,7 @@ import java.util.Calendar;
  * Created by i on 20.01.2018.
  */
 public class RecordManager {
-    private static final String REPORT_DIRECTPRY = "//CreepyCrowler//reports";
+    private static final String REPORT_DIRECTPRY = "//CreepyCrawler//reports";
     private static final String USER_HOME_DIR = System.getProperty("user.home");
     private static File dir = new File(USER_HOME_DIR + REPORT_DIRECTPRY);
 

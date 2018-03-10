@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="2100837_ancifa" uuid="3118e226-2517-4bb2-a12d-27fd378f5c76">
+    <data-source source="LOCAL" name="crawler@localhost" uuid="527a5900-e7d4-4213-a0d2-8c9310fbebce">
       <driver-ref>mysql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://fdb12.007gb.com:3306/2100837_ancifa</jdbc-url>
+      <jdbc-url>jdbc:mysql://localhost:3306/crawler</jdbc-url>
       <driver-properties>
         <property name="autoReconnect" value="true" />
         <property name="zeroDateTimeBehavior" value="convertToNull" />

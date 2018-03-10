@@ -136,9 +136,6 @@ public class DataCollector {
     private void addEmails(Result result, ListingDetail listingDetail) {
         ArrayList<String> emailList = listingDetail.getExtraEmails().getExtraEmail();
         result.setEmailsList(emailList);
-/*        for (String email : emailList) {
-            result.getEmailsList().add(email);
-        }*/
         if (!"".equals(listingDetail.getEmail())) {
             result.getEmailsList().add(listingDetail.getEmail());
         }

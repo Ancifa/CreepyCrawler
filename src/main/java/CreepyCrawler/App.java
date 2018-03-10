@@ -5,9 +5,11 @@ import CreepyCrawler.crawler.manager.WebCrawler;
 import CreepyCrawler.crawler.model.Result;
 import CreepyCrawler.crawler.model.search.Search;
 import CreepyCrawler.crawler.model.search.SearchListing;
+import CreepyCrawler.db.ListingDAO;
 import CreepyCrawler.reports.ExcelWriter;
 import CreepyCrawler.reports.RecordManager;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -29,6 +31,7 @@ public class App {
         startTime = System.currentTimeMillis();
         try {
             processJob(location, category);
+            saveResultsToDb(results, category);
             ExcelWriter excelWriter = new ExcelWriter();
             excelWriter.write(category + " " + location, results, location, category);
         } catch (Exception e) {
@@ -76,6 +79,13 @@ public class App {
             recordsWithEmailCounter++;
         }
         totalRecordsCounter++;
+    }
+
+    private void saveResultsToDb(ArrayList<Result> results, String category) throws SQLException, ClassNotFoundException {
+        ListingDAO listingDAO = new ListingDAO();
+        for (Result result : results) {
+            listingDAO.saveListingToDb(result, category);
+        }
     }
 
     private boolean isEmailListNotEmpty(Result result) {
