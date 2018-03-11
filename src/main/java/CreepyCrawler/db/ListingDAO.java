@@ -25,6 +25,11 @@ public class ListingDAO {
     public void saveListingToDb(Result result, String category) throws SQLException, ClassNotFoundException {
         Connection connection = makeConnection();
 
+        if (isListingExists(connection, result.getListingId())) {
+            connection.close();
+            return;
+        }
+
         String statementString =
                 "INSERT INTO crawler.listing (yp_id, name, city, state, category, search_key) VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -42,6 +47,17 @@ public class ListingDAO {
         resultSet.next();
 
         saveEmailToDb(connection, result, resultSet.getInt(1));
+    }
+
+    private boolean isListingExists(Connection connection, String listingId) throws SQLException {
+        String statementString =
+                "SELECT COUNT(*) FROM crawler.listing WHERE yp_id = " + Integer.parseInt(listingId);
+        PreparedStatement statement = connection.prepareStatement(statementString);
+//        statement.setInt(1, Integer.parseInt(listingId));
+        ResultSet resultSet = statement.executeQuery(statementString);
+        resultSet.next();
+
+        return resultSet.getInt(1) > 0;
     }
 
     private void saveEmailToDb(Connection connection, Result result, int listingId) throws SQLException, ClassNotFoundException {
@@ -65,5 +81,9 @@ public class ListingDAO {
 
     public void getEmailsByListingId() {
 
+    }
+
+    public int getDbListingIdByYpId(Connection connection, int ypId) {
+        return 0;
     }
 }

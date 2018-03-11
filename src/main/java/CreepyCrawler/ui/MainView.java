@@ -126,9 +126,6 @@ public class MainView extends UI {
     private class BarThread implements Runnable {
         @Override
         public void run() {
-//            getUI().getSession().getLockInstance();
-//            progressBarLayout.setVisible(true);
-            resultString.setValue("");
             String totalNumber = "";
             while (!interrupted) {
                 category.setEnabled(false);
@@ -168,6 +165,7 @@ public class MainView extends UI {
         public void run() {
             app.setRecordsWithEmailCounter(0);
             app.setTotalRecordsCounter(0);
+            resultString.setValue("");
             filePathString.setValue("");
             progressBarLayout.setVisible(true);
 

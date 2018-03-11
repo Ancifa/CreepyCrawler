@@ -94,8 +94,12 @@ public class App {
 
     private String calcJobTime(long startTime) {
         long endTime = System.currentTimeMillis();
-        String workTime = (double) (endTime - startTime) / 1000 + " sec";
+        int time = (int) ((endTime - startTime) / 1000);
+        int minutes = time / 60;
+        int seconds = time % 60;
+        String workTime = minutes == 0 ? seconds + " sec" : minutes + " min " + seconds + " sec";
         String withEmails = isRecordWithoutEmailNeeded() ? "" : "with e-mails ";
+
         return recordsWithEmailCounter + " records " + withEmails + "of total "
                 + totalListingsNumber + " records were found." + " Work time: " + workTime;
     }
