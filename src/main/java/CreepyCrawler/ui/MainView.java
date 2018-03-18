@@ -29,6 +29,7 @@ public class MainView extends UI {
     private ProgressBar progressBar;
     private Label resultString;
     private Label filePathString;
+    private MailBlock mailBlock;
 
     private boolean interrupted;
     private App app;
@@ -46,7 +47,10 @@ public class MainView extends UI {
         VerticalLayout headerLayout = buildHeader();
         VerticalLayout searchLayout = buildSearchLayout();
 
-        mainLayout.addComponents(headerLayout, searchLayout);
+        mailBlock = new MailBlock();
+        VerticalLayout emailLayout = mailBlock.buildMailBlock();
+
+        mainLayout.addComponents(headerLayout, searchLayout, emailLayout);
         setContent(mainLayout);
     }
 
@@ -146,7 +150,6 @@ public class MainView extends UI {
                     e.printStackTrace();
                 }
             }
-//            progressBarLayout.setVisible(false);
             progressBar.setValue(0.0f);
         }
     }

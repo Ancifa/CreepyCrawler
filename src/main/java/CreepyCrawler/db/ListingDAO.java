@@ -1,9 +1,11 @@
 package CreepyCrawler.db;
 
 import CreepyCrawler.crawler.model.Result;
+import CreepyCrawler.mail.MailObject;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by i on 10.03.2018.
@@ -75,15 +77,64 @@ public class ListingDAO {
         connection.close();
     }
 
-    public void updateSendStatus() {
+    public void updateSendStatus(int listingId) throws SQLException, ClassNotFoundException {
+        Connection connection = makeConnection();
 
+        String statementString = "UPDATE email SET is_sent = ?, send_date = ? WHERE listing_id = " + listingId;
+        PreparedStatement statement = connection.prepareStatement(statementString);
+        statement.setInt(1, 1);
+        statement.setDate(2, new Date(Calendar.getInstance().getTimeInMillis()));
+        statement.executeUpdate();
+
+        connection.close();
     }
 
-    public void getEmailsByListingId() {
+    public MailObject getFirstNotSentEmail() throws SQLException, ClassNotFoundException {
+        Connection connection = makeConnection();
 
+        String statementString = "SELECT listing_id FROM email WHERE is_sent = 0 LIMIT 1";
+        PreparedStatement statement = connection.prepareStatement(statementString);
+        ResultSet resultSet = statement.executeQuery(statementString);
+        resultSet.next();
+        int id = resultSet.getInt(1);
+
+        String emails = getEmailsById(connection, id);
+        String businessName = getNameById(connection, id);
+
+        MailObject mailObject = new MailObject();
+        mailObject.setId(id);
+        mailObject.setEmails(emails);
+        mailObject.setBusinessName(businessName);
+
+        connection.close();
+
+        return mailObject;
     }
 
-    public int getDbListingIdByYpId(Connection connection, int ypId) {
-        return 0;
+    private String getEmailsById(Connection connection, int id) throws SQLException {
+        String statementString = "SELECT email FROM email WHERE listing_id = " + id;
+        PreparedStatement statement = connection.prepareStatement(statementString);
+        ResultSet resultSet = statement.executeQuery(statementString);
+
+        StringBuilder emails = new StringBuilder();
+        int comma = 0;
+        while (resultSet.next()) {
+            if (comma > 0) {
+                emails.append(",");
+            }
+            emails.append(resultSet.getString(1));
+            comma++;
+        }
+
+        return emails.toString();
+    }
+
+    private String getNameById(Connection connection, int id) throws SQLException {
+        String statementString = "SELECT name FROM listing WHERE id = " + id;
+        PreparedStatement statement = connection.prepareStatement(statementString);
+        ResultSet resultSet = statement.executeQuery(statementString);
+        resultSet.next();
+
+        return resultSet.getString(1);
     }
 }
