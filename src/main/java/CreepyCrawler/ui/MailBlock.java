@@ -105,7 +105,7 @@ public class MailBlock {
                         mailObject = listingDAO.getFirstNotSentEmail();
                         if (mailObject != null) {
                             listingDAO.updateSendStatus(mailObject.getId());
-                            mailService.sendEmail("arenda-cosmos@narod.ru", mailObject.getBusinessName());
+                            mailService.sendEmail(mailObject.getEmails(), mailObject.getBusinessName());
                             count++;
                             results.setValue(count + " sent OK to " + mailObject.getBusinessName());
                         }
@@ -114,7 +114,7 @@ public class MailBlock {
                     e.printStackTrace();
                     results.setValue(e.getMessage());
                 }
-            } while (!interrupted && count < 5);
+            } while (!interrupted && count < 10);
 
             interrupted = false;
             progressBar.setVisible(false);

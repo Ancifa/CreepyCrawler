@@ -59,7 +59,7 @@ public class MailService {
 
     private String getLetterText(String businessName) {
         StringBuilder text = new StringBuilder();
-        text.append("Dear Sirs of ")
+        text.append("Dear Sirs at the ")
                 .append(businessName)
                 .append(",\n\n")
                 .append("We are a team of enthusiasts, who help seniors, disabled people and people " +
@@ -73,7 +73,8 @@ public class MailService {
                         "appreciate any amount of your donation to our PayPal account " +
                         "http://www.paypal.me/compdonor/.\n\n")
                 .append("Please visit us on http://comp-donor.mywebcommunity.org/start_eng.html.\n\n")
-                .append("Thanks a lot and God Bless You!");
+                .append("Thanks a lot and God Bless You!\n\n")
+                .append("Sincerely,\n\nDimitri Arkhipov\nComputer Donor");
 
         return text.toString();
     }
