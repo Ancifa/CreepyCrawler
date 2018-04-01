@@ -16,7 +16,7 @@ public class ListingDAO {
     private final String DB_USER = "Ancifa";
     private final String DB_PASSWORD = "xfosus";
 
-    public ListingDAO() throws SQLException, ClassNotFoundException {
+    public ListingDAO() {
     }
 
     private Connection makeConnection() throws ClassNotFoundException, SQLException {

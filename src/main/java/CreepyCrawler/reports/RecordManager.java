@@ -12,7 +12,8 @@ import java.util.Calendar;
 public class RecordManager {
     private static final String REPORT_DIRECTPRY = "//CreepyCrawler//reports";
     private static final String USER_HOME_DIR = System.getProperty("user.home");
-    private static File dir = new File(USER_HOME_DIR + REPORT_DIRECTPRY);
+    private static final String USER_HOME_DIR_ALT = "C:";
+    private static File dir = new File(USER_HOME_DIR_ALT + REPORT_DIRECTPRY);
 
     private static String reportFilePath;
 

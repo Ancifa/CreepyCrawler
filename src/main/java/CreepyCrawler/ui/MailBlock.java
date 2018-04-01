@@ -41,11 +41,11 @@ public class MailBlock {
 
         button = new Button("Start");
         button.addClickListener(clickEvent -> {
-           if ("Start".equals(button.getCaption())) {
-               onStartClickActions();
-           } else {
-               onStopClickActions();
-           }
+            if ("Start".equals(button.getCaption())) {
+                onStartClickActions();
+            } else {
+                onStopClickActions();
+            }
         });
 
         progressBar = new ProgressBar();
@@ -88,29 +88,21 @@ public class MailBlock {
 
             MailService mailService = new MailService((String) mailServices.getValue(), passwordField.getValue());
 
-            ListingDAO listingDAO = null;
-            try {
-                listingDAO = new ListingDAO();
-            } catch (SQLException | ClassNotFoundException e) {
-                e.printStackTrace();
-                results.setValue(e.getMessage());
-            }
+            ListingDAO listingDAO = new ListingDAO();
 
             MailObject mailObject;
             int count = 0;
 
             do {
                 try {
-                    if (listingDAO != null) {
-                        mailObject = listingDAO.getFirstNotSentEmail();
-                        if (mailObject != null) {
-                            listingDAO.updateSendStatus(mailObject.getId());
-                            mailService.sendEmail(mailObject.getEmails(), mailObject.getBusinessName());
-                            count++;
-                            results.setValue(count + " sent OK to " + mailObject.getBusinessName());
-                        }
+                    mailObject = listingDAO.getFirstNotSentEmail();
+                    if (mailObject != null) {
+                        listingDAO.updateSendStatus(mailObject.getId());
+                        mailService.sendEmail(mailObject.getEmails(), mailObject.getBusinessName());
+                        count++;
+                        results.setValue(count + " sent OK to " + mailObject.getBusinessName());
                     }
-                } catch(MessagingException | SQLException | ClassNotFoundException e){
+                } catch (MessagingException | SQLException | ClassNotFoundException e) {
                     e.printStackTrace();
                     results.setValue(e.getMessage());
                 }

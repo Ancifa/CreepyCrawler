@@ -8,6 +8,7 @@ import CreepyCrawler.crawler.model.search.SearchListing;
 import CreepyCrawler.db.ListingDAO;
 import CreepyCrawler.reports.ExcelWriter;
 import CreepyCrawler.reports.RecordManager;
+import com.vaadin.ui.Notification;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -31,11 +32,12 @@ public class App {
         startTime = System.currentTimeMillis();
         try {
             processJob(location, category);
-            saveResultsToDb(results, category);
+//            saveResultsToDb(results, category);
             ExcelWriter excelWriter = new ExcelWriter();
             excelWriter.write(category + " " + location, results, location, category);
         } catch (Exception e) {
             e.printStackTrace();
+            Notification.show(e.getMessage(), Notification.Type.WARNING_MESSAGE);
             StringBuilder logText = new StringBuilder(Calendar.getInstance().getTime().toString());
             logText.append("\r\n");
             logText.append(e);
