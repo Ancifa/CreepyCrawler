@@ -10,7 +10,7 @@ import java.util.Calendar;
  * Created by i on 20.01.2018.
  */
 public class RecordManager {
-    private static final String REPORT_DIRECTPRY = "//CreepyCrawler//reports";
+    private static final String REPORT_DIRECTPRY = "\\CreepyCrawler\\reports";
     private static final String USER_HOME_DIR = System.getProperty("user.home");
     private static final String USER_HOME_DIR_ALT = "C:";
     private static File dir = new File(USER_HOME_DIR_ALT + REPORT_DIRECTPRY);
@@ -27,7 +27,7 @@ public class RecordManager {
 
     public static void makeReportFile(String fileName) {
         makeReportsDir();
-        reportFilePath = dir + "//" + fileName;
+        reportFilePath = dir + "\\" + fileName;
         File file = new File(reportFilePath);
         try {
             StringBuilder message = new StringBuilder(Calendar.getInstance().getTime().toString());
@@ -44,7 +44,7 @@ public class RecordManager {
     }
 
     public static void writeReportRecord(String fileName, String record) {
-        reportFilePath = dir + "//" + fileName;
+        reportFilePath = dir + "\\" + fileName;
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(reportFilePath, true));
@@ -63,7 +63,7 @@ public class RecordManager {
         }
     }
 
-    public static String getReportsDirPath() throws Exception{
+    public static String getReportsDirPath() {
         if (dir.exists()) {
             return dir.getPath();
         } else {
