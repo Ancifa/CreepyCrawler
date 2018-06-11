@@ -132,7 +132,8 @@ public class MainView extends UI {
     private class BarThread implements Runnable {
         @Override
         public void run() {
-            String totalNumber = "";
+            setPollInterval(100);
+            String totalNumber;
             while (!interrupted) {
                 category.setEnabled(false);
                 location.setEnabled(false);
@@ -186,7 +187,7 @@ public class MainView extends UI {
             searchTypeSwitcher.setEnabled(true);
             searchTypeSwitcher.setSelectedItem("With emails only");
             searchButton.setEnabled(true);
-            filePathString.setValue("Check the file with records at your Downloads Folder.");
+            filePathString.setValue("Check the file with records in your Downloads Folder.");
         }
     }
 
