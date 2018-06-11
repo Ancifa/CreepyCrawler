@@ -1,15 +1,9 @@
 package CreepyCrawler.reports;
 
 import CreepyCrawler.crawler.model.Result;
-import org.apache.commons.exec.util.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,21 +15,11 @@ public class ExcelWriter {
 
     private List<String> headerColumns;
 
-    public List<String> getHeaderColumns() {
-        return headerColumns;
-    }
-
-    public void setHeaderColumns(ArrayList<String> headerColumns) {
-        this.headerColumns = headerColumns;
-    }
-
-    public void setHeaderColumns() {
+    private void setHeaderColumns() {
         headerColumns = Arrays.asList("Listing ID", "Business Name", "Email", "City", "State", "Category");
     }
 
-    public void write(String fileName, ArrayList<Result> results, String location, String category) throws Exception {
-        String fullFileName = RecordManager.getReportsDirPath() + "//" + fileName + ".xls";
-//        Workbook workbook = WorkbookFactory.create(new File(fullFileName));
+    public Workbook write(ArrayList<Result> results, String location, String category) {
         Workbook workbook = new HSSFWorkbook();
 
         Sheet sheet = workbook.createSheet(location + " " + category);
@@ -82,9 +66,6 @@ public class ExcelWriter {
             sheet.autoSizeColumn(i);
         }
 
-        FileOutputStream outputStream = new FileOutputStream(fullFileName);
-        workbook.write(outputStream);
-        outputStream.close();
-
+        return workbook;
     }
 }

@@ -8,7 +8,10 @@ import CreepyCrawler.crawler.model.search.SearchListing;
 import CreepyCrawler.db.ListingDAO;
 import CreepyCrawler.reports.ExcelWriter;
 import CreepyCrawler.reports.RecordManager;
+import CreepyCrawler.ui.ExportToExcel;
+import com.vaadin.server.StreamResource;
 import com.vaadin.ui.Notification;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -27,6 +30,8 @@ public class App {
     private Integer totalListingsNumber;
     private boolean recordWithoutEmailNeeded;
 
+    private StreamResource resource;
+
     public String search(String location, String category) {
         long startTime;
         startTime = System.currentTimeMillis();
@@ -34,7 +39,9 @@ public class App {
             processJob(location, category);
 //            saveResultsToDb(results, category);
             ExcelWriter excelWriter = new ExcelWriter();
-            excelWriter.write(category + " " + location, results, location, category);
+            Workbook workbook = excelWriter.write(results, location, category);
+            ExportToExcel exportToExcel = new ExportToExcel();
+            resource = exportToExcel.downloadExcelFile(workbook, category + " " + location);
         } catch (Exception e) {
             e.printStackTrace();
             Notification.show(e.getMessage(), Notification.Type.WARNING_MESSAGE);
@@ -143,5 +150,9 @@ public class App {
 
     public void setRecordWithoutEmailNeeded(boolean recordWithoutEmailNeeded) {
         this.recordWithoutEmailNeeded = recordWithoutEmailNeeded;
+    }
+
+    public StreamResource getResource() {
+        return resource;
     }
 }

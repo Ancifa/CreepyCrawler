@@ -3,6 +3,7 @@ package CreepyCrawler.ui;
 import CreepyCrawler.App;
 import CreepyCrawler.reports.RecordManager;
 import com.vaadin.annotations.Theme;
+import com.vaadin.server.ResourceReference;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.ContentMode;
@@ -142,7 +143,7 @@ public class MainView extends UI {
                     totalNumber = " of " + String.valueOf(app.getTotalListingsNumber());
                     float progress = (float) app.getTotalRecordsCounter() / app.getTotalListingsNumber();
                     resultString.setValue(String.valueOf(app.getTotalRecordsCounter()) + totalNumber
-                    + " (" + Math.round(progress * 100) + "%)");
+                            + " (" + Math.round(progress * 100) + "%)");
                     progressBar.setValue(progress);
                 }
                 try {
@@ -155,7 +156,7 @@ public class MainView extends UI {
         }
     }
 
-    private class SearchThread implements Runnable {
+    public class SearchThread implements Runnable {
 
         private String locationValue;
         private String categoryValue;
@@ -174,6 +175,8 @@ public class MainView extends UI {
             progressBarLayout.setVisible(true);
 
             String result = app.search(locationValue, categoryValue);
+            downloadExcel();
+
             interrupted = true;
 
             progressBarLayout.setVisible(false);
@@ -183,12 +186,13 @@ public class MainView extends UI {
             searchTypeSwitcher.setEnabled(true);
             searchTypeSwitcher.setSelectedItem("With emails only");
             searchButton.setEnabled(true);
-
-            try {
-                filePathString.setValue("File is at " + RecordManager.getReportsDirPath());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            filePathString.setValue("Check the file with records at your Downloads Folder.");
         }
+    }
+
+    private void downloadExcel() {
+        ResourceReference reference = new ResourceReference(app.getResource(), this, "download");
+        this.setResource("download", app.getResource());
+        this.getPage().open(reference.getURL(), null);
     }
 }
