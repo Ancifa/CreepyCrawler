@@ -11,10 +11,15 @@ import java.util.Calendar;
  * Created by i on 10.03.2018.
  */
 public class ListingDAO {
-    private final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
+/*    private final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
     private final String DB_URL = "jdbc:mysql://localhost/crawler";
     private final String DB_USER = "Ancifa";
-    private final String DB_PASSWORD = "xfosus";
+    private final String DB_PASSWORD = "xfosus";*/
+
+    private final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
+    private final String DB_URL = "jdbc:mysql://pandora.lite-host.in:3306/qxdzjhmn_creepycrawler";
+    private final String DB_USER = "qxdzjhmn_ancifa";
+    private final String DB_PASSWORD = "ancifa";
 
     public ListingDAO() {
     }
@@ -33,7 +38,7 @@ public class ListingDAO {
         }
 
         String statementString =
-                "INSERT INTO crawler.listing (yp_id, name, city, state, category, search_key) VALUES (?, ?, ?, ?, ?, ?)";
+                "INSERT INTO listing (yp_id, name, city, state, category, search_key) VALUES (?, ?, ?, ?, ?, ?)";
 
         PreparedStatement statement = connection.prepareStatement(statementString, Statement.RETURN_GENERATED_KEYS);
         statement.setInt(1, Integer.parseInt(result.getListingId()));
@@ -53,7 +58,7 @@ public class ListingDAO {
 
     private boolean isListingExists(Connection connection, String listingId) throws SQLException {
         String statementString =
-                "SELECT COUNT(*) FROM crawler.listing WHERE yp_id = " + Integer.parseInt(listingId);
+                "SELECT COUNT(*) FROM listing WHERE yp_id = " + Integer.parseInt(listingId);
         PreparedStatement statement = connection.prepareStatement(statementString);
 //        statement.setInt(1, Integer.parseInt(listingId));
         ResultSet resultSet = statement.executeQuery(statementString);
@@ -64,7 +69,7 @@ public class ListingDAO {
 
     private void saveEmailToDb(Connection connection, Result result, int listingId) throws SQLException, ClassNotFoundException {
         String statementString =
-                "INSERT INTO crawler.email (listing_id, email) VALUES (?, ?)";
+                "INSERT INTO email (listing_id, email) VALUES (?, ?)";
 
         ArrayList<String> emails = result.getEmailsList();
         for (String email : emails) {

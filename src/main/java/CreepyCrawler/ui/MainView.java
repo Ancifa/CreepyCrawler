@@ -49,8 +49,8 @@ public class MainView extends UI {
         VerticalLayout searchLayout = buildSearchLayout();
 
         mailBlock = new MailBlock();
-//        VerticalLayout emailLayout = mailBlock.buildMailBlock();
-        VerticalLayout emailLayout = new VerticalLayout();
+        VerticalLayout emailLayout = mailBlock.buildMailBlock();
+//        VerticalLayout emailLayout = new VerticalLayout();
 
         mainLayout.addComponents(headerLayout, searchLayout, emailLayout);
         setContent(mainLayout);

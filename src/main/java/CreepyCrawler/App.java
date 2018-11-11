@@ -37,7 +37,7 @@ public class App {
         startTime = System.currentTimeMillis();
         try {
             processJob(location, category);
-//            saveResultsToDb(results, category);
+            saveResultsToDb(results, category);
             ExcelWriter excelWriter = new ExcelWriter();
             Workbook workbook = excelWriter.write(results, location, category);
             ExportToExcel exportToExcel = new ExportToExcel();
