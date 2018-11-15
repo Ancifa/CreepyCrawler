@@ -70,7 +70,7 @@ class MailBlock {
         results = new Label();
         resultsLayout.addComponent(results);
 
-        verticalLayout.addComponents(headerLayout, summaryLayout, fieldsLayout, resultsLayout);
+        verticalLayout.addComponents(headerLayout, summaryLayout, fieldsLayout, resultsLayout, namesLayout);
 
         return verticalLayout;
     }
