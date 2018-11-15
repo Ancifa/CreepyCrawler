@@ -4,8 +4,8 @@ import CreepyCrawler.crawler.model.Result;
 import CreepyCrawler.mail.MailObject;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.sql.Date;
+import java.util.*;
 
 /**
  * Created by i on 10.03.2018.
@@ -141,5 +141,46 @@ public class ListingDAO {
         resultSet.next();
 
         return resultSet.getString(1);
+    }
+
+    public Map<String, Integer> getListingsAndEmailsAmount() throws SQLException, ClassNotFoundException {
+        Connection connection = makeConnection();
+
+        Map<String, Integer> resultMap = new HashMap<>();
+        getEmailsAmount(connection, resultMap);
+        getListingsAmount(connection, resultMap);
+
+        connection.close();
+
+        return resultMap;
+    }
+
+    private void getEmailsAmount(Connection connection, Map<String, Integer> resultMap) throws SQLException {
+        String statementString = "select count(*) total," +
+                "   (select count(*) from email where is_sent = 0) remains from email";
+        PreparedStatement statement = connection.prepareStatement(statementString);
+        ResultSet resultSet = statement.executeQuery(statementString);
+
+        if (resultSet != null) {
+            resultSet.next();
+            resultMap.put("emails_total", resultSet.getInt("total"));
+            resultMap.put("emails_remains", resultSet.getInt("remains"));
+        }
+    }
+
+    private void getListingsAmount(Connection connection, Map<String, Integer> resultMap) throws SQLException {
+        String statementString = "select count(*) total," +
+                "       (select count(distinct l.id)" +
+                "          from email e, listing l" +
+                "            where e.listing_id = l.id and e.is_sent = 0) remains" +
+                "  from  listing l";
+        PreparedStatement statement = connection.prepareStatement(statementString);
+        ResultSet resultSet = statement.executeQuery(statementString);
+
+        if (resultSet != null) {
+            resultSet.next();
+            resultMap.put("listings_total", resultSet.getInt("total"));
+            resultMap.put("listings_remains", resultSet.getInt("remains"));
+        }
     }
 }

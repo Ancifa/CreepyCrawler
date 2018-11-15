@@ -188,6 +188,7 @@ public class MainView extends UI {
             searchTypeSwitcher.setSelectedItem("With emails only");
             searchButton.setEnabled(true);
             filePathString.setValue("Check the file with records in your Downloads Folder.");
+            mailBlock.mountSummaryValues();
         }
     }
 

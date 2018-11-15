@@ -4,30 +4,43 @@ import CreepyCrawler.db.ListingDAO;
 import CreepyCrawler.mail.MailObject;
 import CreepyCrawler.mail.MailService;
 import com.vaadin.ui.*;
-import org.apache.commons.exec.util.StringUtils;
 
 import javax.mail.MessagingException;
 import java.sql.SQLException;
 
-public class MailBlock {
+class MailBlock {
 
+    private ListingDAO listingDAO;
+
+    private Label listingsRemains;
+    private Label listingsTotal;
+    private Label emailsRemains;
+    private Label emailsTotal;
     private ComboBox mailServices;
     private PasswordField passwordField;
     private Button button;
     private ProgressBar progressBar;
     private Label results;
+    private VerticalLayout namesLayout;
 
     private boolean interrupted;
 
-    public VerticalLayout buildMailBlock() {
+    MailBlock() {
+        listingDAO = new ListingDAO();
+    }
+
+    VerticalLayout buildMailBlock() {
         VerticalLayout verticalLayout = new VerticalLayout();
         HorizontalLayout headerLayout = new HorizontalLayout();
+        HorizontalLayout summaryLayout = new HorizontalLayout();
         HorizontalLayout fieldsLayout = new HorizontalLayout();
         HorizontalLayout resultsLayout = new HorizontalLayout();
+        namesLayout = new VerticalLayout();
 
-        Label label = new Label();
-        label.setValue("Mail Service");
+        Label label = new Label("Mail Service");
         headerLayout.addComponent(label);
+
+        buildSummaryLayout(summaryLayout);
 
         mailServices = new ComboBox();
         mailServices.setItems(MailService.YAHOO_ADDRESS, MailService.GMAIL_ADDRESS);
@@ -57,9 +70,34 @@ public class MailBlock {
         results = new Label();
         resultsLayout.addComponent(results);
 
-        verticalLayout.addComponents(headerLayout, fieldsLayout, resultsLayout);
+        verticalLayout.addComponents(headerLayout, summaryLayout, fieldsLayout, resultsLayout);
 
         return verticalLayout;
+    }
+
+    private void buildSummaryLayout(HorizontalLayout summaryLayout) {
+        Label listingsLabel = new Label("Listings remain: ");
+        Label middleLabel = new Label(" out of ");
+        Label middleLabel2 = new Label(" out of ");
+        Label emailsLabel = new Label(" Emails remain: ");
+        listingsRemains = new Label();
+        listingsTotal = new Label();
+        emailsRemains = new Label();
+        emailsTotal = new Label();
+        mountSummaryValues();
+        summaryLayout.addComponents(listingsLabel, listingsRemains, middleLabel, listingsTotal,
+                emailsLabel, emailsRemains, middleLabel2, emailsTotal);
+    }
+
+    public void mountSummaryValues() {
+        try {
+            listingsRemains.setValue(listingDAO.getListingsAndEmailsAmount().get("listings_remains").toString());
+            listingsTotal.setValue(listingDAO.getListingsAndEmailsAmount().get("listings_total").toString());
+            emailsRemains.setValue(listingDAO.getListingsAndEmailsAmount().get("emails_remains").toString());
+            emailsTotal.setValue(listingDAO.getListingsAndEmailsAmount().get("emails_total").toString());
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     private void onStartClickActions() {
@@ -85,10 +123,9 @@ public class MailBlock {
             progressBar.setVisible(true);
             button.setCaption("Stop");
             results.setValue("");
+            namesLayout.removeAllComponents();
 
             MailService mailService = new MailService((String) mailServices.getValue(), passwordField.getValue());
-
-            ListingDAO listingDAO = new ListingDAO();
 
             MailObject mailObject;
             int count = 0;
@@ -100,7 +137,7 @@ public class MailBlock {
                         listingDAO.updateSendStatus(mailObject.getId());
                         mailService.sendEmail(mailObject.getEmails(), mailObject.getBusinessName());
                         count++;
-                        results.setValue(count + " sent OK to " + mailObject.getBusinessName());
+                        namesLayout.addComponent(new Label(count + ". Sent OK to " + mailObject.getBusinessName()));
                     }
                 } catch (MessagingException | SQLException | ClassNotFoundException e) {
                     e.printStackTrace();
@@ -112,6 +149,7 @@ public class MailBlock {
             progressBar.setVisible(false);
             button.setCaption("Start");
             results.setValue(count + " emails sent.");
+            mountSummaryValues();
         }
     }
 }
