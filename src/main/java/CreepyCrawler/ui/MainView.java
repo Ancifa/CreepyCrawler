@@ -1,7 +1,6 @@
 package CreepyCrawler.ui;
 
 import CreepyCrawler.App;
-import CreepyCrawler.reports.RecordManager;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.ResourceReference;
 import com.vaadin.server.ThemeResource;
@@ -38,7 +37,7 @@ public class MainView extends UI {
 
     @Override
     public void init(VaadinRequest vaadinRequest) {
-        setPollInterval(100);
+        setPollInterval(300);
         buildLayout();
     }
 
@@ -50,7 +49,6 @@ public class MainView extends UI {
 
         mailBlock = new MailBlock();
         VerticalLayout emailLayout = mailBlock.buildMailBlock();
-//        VerticalLayout emailLayout = new VerticalLayout();
 
         mainLayout.addComponents(headerLayout, searchLayout, emailLayout);
         setContent(mainLayout);
@@ -129,6 +127,26 @@ public class MainView extends UI {
         return searchLayout;
     }
 
+    private MainView getMainView() {
+        return this;
+    }
+
+    public void setInterrupted(boolean interrupted) {
+        this.interrupted = interrupted;
+    }
+
+    public Label getResultString() {
+        return resultString;
+    }
+
+    public HorizontalLayout getProgressBarLayout() {
+        return progressBarLayout;
+    }
+
+    public Label getFilePathString() {
+        return filePathString;
+    }
+
     private class BarThread implements Runnable {
         @Override
         public void run() {
@@ -175,13 +193,12 @@ public class MainView extends UI {
             filePathString.setValue("");
             progressBarLayout.setVisible(true);
 
-            String result = app.search(locationValue, categoryValue);
+            long startTime = System.currentTimeMillis();
+            app.search(locationValue, categoryValue, getMainView());
+            resultString.setValue(makeResultString(startTime));
+
             downloadExcel();
 
-            interrupted = true;
-
-            progressBarLayout.setVisible(false);
-            resultString.setValue(result);
             category.setEnabled(true);
             location.setEnabled(true);
             searchTypeSwitcher.setEnabled(true);
@@ -190,6 +207,17 @@ public class MainView extends UI {
             filePathString.setValue("Check the file with records in your Downloads Folder.");
             mailBlock.mountSummaryValues();
         }
+
+        private String makeResultString(long startTime) {
+            long endTime = System.currentTimeMillis();
+            int time = (int) ((endTime - startTime) / 1000);
+            int minutes = time / 60;
+            int seconds = time % 60;
+            String workTime = minutes == 0 ? seconds + " sec" : minutes + " min " + seconds + " sec";
+            String withEmails = app.isRecordWithoutEmailNeeded() ? "" : "with e-mails ";
+
+            return app.getRecordsWithEmailCounter() + " records " + withEmails + "of total "
+                    + app.getTotalListingsNumber() + " records were found." + " Work time: " + workTime;        }
     }
 
     private void downloadExcel() {

@@ -1,7 +1,6 @@
 package CreepyCrawler;
 
 import CreepyCrawler.crawler.manager.DataCollector;
-import CreepyCrawler.crawler.manager.WebCrawler;
 import CreepyCrawler.crawler.model.Result;
 import CreepyCrawler.crawler.model.search.Search;
 import CreepyCrawler.crawler.model.search.SearchListing;
@@ -9,7 +8,9 @@ import CreepyCrawler.db.ListingDAO;
 import CreepyCrawler.reports.ExcelWriter;
 import CreepyCrawler.reports.RecordManager;
 import CreepyCrawler.ui.ExportToExcel;
+import CreepyCrawler.ui.MainView;
 import com.vaadin.server.StreamResource;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -18,9 +19,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 public class App {
-    private String browsingUrl = "https://www.yellowpages.com/search?search_terms=it+company&geo_location_terms=San+Francisco%2C+CA";
-    private String reportFileName = "results.xls";
-
     private DataCollector collector = new DataCollector();
     private ArrayList<Result> results = new ArrayList<>();
 
@@ -32,12 +30,16 @@ public class App {
 
     private StreamResource resource;
 
-    public String search(String location, String category) {
-        long startTime;
-        startTime = System.currentTimeMillis();
+    public void search(String location, String category, MainView mainView) {
         try {
             processJob(location, category);
+
+            mainView.setInterrupted(true);
+            mainView.getResultString().setValue("Results are saving to the Data Base...");
+            mainView.getProgressBarLayout().setVisible(false);
             saveResultsToDb(results, category);
+
+            mainView.getFilePathString().setValue("Results' file is downloading...");
             ExcelWriter excelWriter = new ExcelWriter();
             Workbook workbook = excelWriter.write(results, location, category);
             ExportToExcel exportToExcel = new ExportToExcel();
@@ -45,13 +47,9 @@ public class App {
         } catch (Exception e) {
             e.printStackTrace();
             Notification.show(e.getMessage(), Notification.Type.WARNING_MESSAGE);
-            StringBuilder logText = new StringBuilder(Calendar.getInstance().getTime().toString());
-            logText.append("\r\n");
-            logText.append(e);
             RecordManager.makeReportFile("log.txt");
-            RecordManager.writeReportRecord("log.txt", "\r\n" + logText.toString());
-        } finally {
-            return calcJobTime(startTime);
+            String logText = Calendar.getInstance().getTime().toString() + "\r\n" + e;
+            RecordManager.writeReportRecord("log.txt", "\r\n" + logText);
         }
     }
 
@@ -66,7 +64,6 @@ public class App {
             for (SearchListing searchListing : listingsSearchList) {
                 collectData(searchListing);
             }
-//        } while (false);
         } while (isNextPageNeeded(pageNumber));
     }
 
@@ -101,31 +98,12 @@ public class App {
         return result.getEmailsList().stream().anyMatch(a -> !"".equals(a));
     }
 
-    private String calcJobTime(long startTime) {
-        long endTime = System.currentTimeMillis();
-        int time = (int) ((endTime - startTime) / 1000);
-        int minutes = time / 60;
-        int seconds = time % 60;
-        String workTime = minutes == 0 ? seconds + " sec" : minutes + " min " + seconds + " sec";
-        String withEmails = isRecordWithoutEmailNeeded() ? "" : "with e-mails ";
-
-        return recordsWithEmailCounter + " records " + withEmails + "of total "
-                + totalListingsNumber + " records were found." + " Work time: " + workTime;
-    }
-
-    private void testingCrawler() {
-        WebCrawler crawler = new WebCrawler();
-        crawler.setUp();
-        crawler.browseWebPage(browsingUrl, reportFileName);
-        crawler.tearDown();
+    public void setRecordsWithEmailCounter(int recordsWithEmailCounter) {
+        this.recordsWithEmailCounter = recordsWithEmailCounter;
     }
 
     public int getRecordsWithEmailCounter() {
         return recordsWithEmailCounter;
-    }
-
-    public void setRecordsWithEmailCounter(int recordsWithEmailCounter) {
-        this.recordsWithEmailCounter = recordsWithEmailCounter;
     }
 
     public int getTotalRecordsCounter() {
@@ -140,7 +118,7 @@ public class App {
         return totalListingsNumber;
     }
 
-    public void setTotalListingsNumber(Integer totalListingsNumber) {
+    void setTotalListingsNumber(Integer totalListingsNumber) {
         this.totalListingsNumber = totalListingsNumber;
     }
 
