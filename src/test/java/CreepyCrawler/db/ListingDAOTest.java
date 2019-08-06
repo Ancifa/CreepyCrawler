@@ -1,50 +1,45 @@
 package CreepyCrawler.db;
 
-import org.junit.Ignore;
+import CreepyCrawler.AppTestConfig;
+import CreepyCrawler.client.DbConnectorClient;
+import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Map;
 
-@Component
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = AppTestConfig.class)
+@SpringBootTest()
 public class ListingDAOTest {
+    @Autowired
+    private DbConnectorClient dbConnectorClient;
 
-    private DataSource dataSource;
-
-    public ListingDAOTest() {
-        this.dataSource = DataSourceBuilder
-                .create()
-                .username("qxdzjhmn_ancifa")
-                .password("ancifa")
-                .url("jdbc:mysql://pandora.lite-host.in:3306/qxdzjhmn_creepycrawler")
-                .driverClassName("com.mysql.jdbc.Driver")
-                .build();
-/*        dataSource = DataSourceBuilder
-                .create()
-                .username("Ancifa")
-                .password("xfosus")
-                .url("jdbc:mysql://localhost:3306/crawler")
-                .driverClassName("com.mysql.jdbc.Driver")
-                .build();*/
-    }
-
-    private List<String> findAllBookings() {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        return jdbcTemplate.query("select email from email where id in (1,2)",
-                (rs, rowNum) -> rs.getString("email"));
-    }
-
-    @Ignore
     @Test
-    public void testDb() throws SQLException, ClassNotFoundException {
+    public void testListingsAndEmailsAmount() throws SQLException, ClassNotFoundException {
         ListingDAO listingDAO = new ListingDAO();
-        listingDAO.getListingsAndEmailsAmount();
+        Map<String, Integer> listingsAndEmailsAmount = listingDAO.getListingsAndEmailsAmount();
 
-/*        List<String> res = findAllBookings();
-        System.out.println(res.get(0));*/
+        System.out.println(listingsAndEmailsAmount.toString());
+        Assert.assertTrue(listingsAndEmailsAmount.size() > 0);
+    }
+
+    @Test
+    public void testIsListingNotExistsWithoutDbConnector() throws Exception {
+        ListingDAO listingDAO = new ListingDAO();
+        Assert.assertFalse(listingDAO.isListingNotExists("466235186"));
+        Assert.assertTrue(listingDAO.isListingNotExists("0"));
+    }
+
+    @Test
+    public void testIsListingNotExistsWithDbConnector() throws Exception {
+        ListingDAO listingDAO = new ListingDAO(dbConnectorClient);
+        Assert.assertFalse(listingDAO.isListingNotExists("466235186"));
+        Assert.assertTrue(listingDAO.isListingNotExists("0"));
     }
 }

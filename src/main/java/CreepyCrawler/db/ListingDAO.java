@@ -1,7 +1,9 @@
 package CreepyCrawler.db;
 
+import CreepyCrawler.client.DbConnectorClient;
 import CreepyCrawler.crawler.model.Result;
 import CreepyCrawler.mail.MailObject;
+import org.springframework.stereotype.Component;
 
 import java.sql.*;
 import java.sql.Date;
@@ -10,18 +12,23 @@ import java.util.*;
 /**
  * Created by i on 10.03.2018.
  */
+@Component
 public class ListingDAO {
-/*    private final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
-    private final String DB_URL = "jdbc:mysql://localhost/crawler";
-    private final String DB_USER = "Ancifa";
-    private final String DB_PASSWORD = "xfosus";*/
-
     private final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
     private final String DB_URL = "jdbc:mysql://pandora.lite-host.in:3306/qxdzjhmn_creepycrawler";
     private final String DB_USER = "qxdzjhmn_ancifa";
     private final String DB_PASSWORD = "ancifa";
 
+    private DbConnectorClient dbConnectorClient;
+
+    private boolean isDbConnectorClientUsing;
+
     public ListingDAO() {
+    }
+
+    public ListingDAO(DbConnectorClient dbConnectorClient) {
+        this.dbConnectorClient = dbConnectorClient;
+        isDbConnectorClientUsing = true;
     }
 
     private Connection makeConnection() throws ClassNotFoundException, SQLException {
@@ -31,11 +38,6 @@ public class ListingDAO {
 
     public void saveListingToDb(Result result, String category) throws SQLException, ClassNotFoundException {
         Connection connection = makeConnection();
-
-        if (isListingExists(connection, result.getListingId())) {
-            connection.close();
-            return;
-        }
 
         String statementString =
                 "INSERT INTO listing (yp_id, name, city, state, category, search_key) VALUES (?, ?, ?, ?, ?, ?)";
@@ -56,15 +58,28 @@ public class ListingDAO {
         saveEmailToDb(connection, result, resultSet.getInt(1));
     }
 
-    private boolean isListingExists(Connection connection, String listingId) throws SQLException {
-        String statementString =
-                "SELECT COUNT(*) FROM listing WHERE yp_id = " + Integer.parseInt(listingId);
-        PreparedStatement statement = connection.prepareStatement(statementString);
-//        statement.setInt(1, Integer.parseInt(listingId));
-        ResultSet resultSet = statement.executeQuery(statementString);
-        resultSet.next();
+    public boolean isListingNotExists(String listingId) throws Exception {
+        if (isDbConnectorClientUsing) {
+            return "0".equals(dbConnectorClient.isListingExists(Long.valueOf(listingId)).getBody());
+        } else {
+            Connection connection = null;
+            try {
+                connection = makeConnection();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                throw new Exception(e);
+            }
 
-        return resultSet.getInt(1) > 0;
+            String statementString =
+                    "SELECT COUNT(*) FROM listing WHERE yp_id = " + Integer.parseInt(listingId);
+            PreparedStatement statement = connection.prepareStatement(statementString);
+            ResultSet resultSet = statement.executeQuery(statementString);
+            resultSet.next();
+            boolean result = resultSet.getInt(1) == 0;
+            connection.close();
+
+            return result;
+        }
     }
 
     private void saveEmailToDb(Connection connection, Result result, int listingId) throws SQLException, ClassNotFoundException {

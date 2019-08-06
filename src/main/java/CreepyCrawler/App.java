@@ -10,11 +10,9 @@ import CreepyCrawler.reports.RecordManager;
 import CreepyCrawler.ui.ExportToExcel;
 import CreepyCrawler.ui.MainView;
 import com.vaadin.server.StreamResource;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -87,10 +85,12 @@ public class App {
         totalRecordsCounter++;
     }
 
-    private void saveResultsToDb(ArrayList<Result> results, String category) throws SQLException, ClassNotFoundException {
+    private void saveResultsToDb(ArrayList<Result> results, String category) throws Exception {
         ListingDAO listingDAO = new ListingDAO();
         for (Result result : results) {
-            listingDAO.saveListingToDb(result, category);
+            if (listingDAO.isListingNotExists(result.getListingId())) {
+                listingDAO.saveListingToDb(result, category);
+            }
         }
     }
 
